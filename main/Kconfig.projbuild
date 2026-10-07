@@ -1,0 +1,221 @@
+menu "Example Configuration"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+    config ESP_WIFI_CHANNEL
+        int "WiFi Channel"
+        range 1 13
+        default 1
+        help
+            WiFi channel (network channel) for the example to use.
+
+    config ESP_MAX_STA_CONN
+        int "Maximal STA connections"
+        default 4
+        range 1 4 if IDF_TARGET_ESP32C2
+        range 1 15
+        help
+            Maximum number of STAs allowed to connect to the soft-AP (wifi_config_t.ap.max_connection).
+            Upper bound matches ESP_WIFI_MAX_CONN_NUM in esp_wifi_types_native.h:
+            1-4 on ESP32-C2, 1-15 on other Wi-Fi chips.
+            Soft-AP and ESP-NOW share encryption keys; see Wi-Fi driver documentation
+            if ESP-NOW is enabled.
+
+    config ESP_GTK_REKEYING_ENABLE
+        bool "Enable GTK Rekeying"
+        default y
+        help
+            Flag to enable GTK rekeying.
+
+    config ESP_GTK_REKEY_INTERVAL
+        int "GTK rekey interval"
+        depends on ESP_GTK_REKEYING_ENABLE
+        range 60 65535
+        default 600
+        help
+            GTK rekeying interval in seconds.
+endmenu
+
+menu "DAPLink Configuration"
+
+    menu "Core Affinity"
+        config DAP_USB_TASK_CORE
+            int "Core running the USB protocol stack"
+            range 0 1
+            default 0
+            help
+                CPU core that runs the TinyUSB device task and the USB endpoint
+                pump task. The Wi-Fi stack is also bound to this core.
+
+        config DAP_PROTO_TASK_CORE
+            int "Core running the DAP/SWD/JTAG protocol"
+            range 0 1
+            default 1
+            help
+                CPU core that runs the CMSIS-DAP command interpreter and drives
+                the SPI/GPIO debug bus. Bound to the other core than the USB task
+                so host transfers and target shifts execute in parallel.
+
+        config DAP_PROTO_TASK_PRIO
+            int "DAP protocol task priority"
+            range 1 24
+            default 22
+            help
+                High priority on the DAP core so SWD/JTAG bit timing is jitter-free.
+    endmenu
+
+    menu "USB Device"
+        config DAP_USB_VID
+            hex "USB Vendor ID"
+            default 0x303A
+            help
+                Test VID (Espressif range). Replace with your own VID for products.
+
+        config DAP_USB_PID
+            hex "USB Product ID"
+            default 0x4041
+
+        config DAP_USB_BULK_EP_SIZE
+            int "Bulk endpoint packet size"
+            range 64 512
+            default 512
+            help
+                512 for high-speed CMSIS-DAP v2. Falls back to 64 if enumerated
+                as full-speed.
+
+        config DAP_USB_PACKET_COUNT
+            int "Queued DAP packets per direction"
+            range 2 16
+            default 8
+
+        config DAP_USBIP_PACKET_SIZE
+            int "Wireless CMSIS-DAP command capacity (not USB endpoint size)"
+            range 512 2048
+            default 512
+            help
+                Logical command/response size reported by wireless DAP_Info.
+                USB/IP preserves URB boundaries, so a command can span several
+                512-byte USB packets. Keil Flash download failed with 1024;
+                host support must be tested. Physical
+                USB bulk and HID retain their existing packet size.
+    endmenu
+
+    menu "Debug Bus Pins"
+        config DAP_SPI_HOST
+            int "SPI host peripheral (2 or 3)"
+            range 2 3
+            default 2
+
+        config DAP_PIN_SWCLK
+            int "SWCLK / TCK pin (SPI SCK)"
+            default 21
+
+        config DAP_PIN_SWDIO_MOSI
+            int "SWDIO/TMS drive pin (SPI MOSI, via 100R series resistor)"
+            default 22
+            help
+                Wire this pin through a ~100 ohm series resistor to the target
+                SWDIO/TMS line. During read phases the pin outputs all-ones and
+                the resistor acts as a weak pull-up, letting the target drive
+                the line (classic DAPLink resistor trick).
+
+        config DAP_PIN_SWDIO_MISO
+            int "SWDIO/TDO sense pin (SPI MISO)"
+            default 23
+            help
+                Connect directly to the target-side node of the series resistor
+                (shared SWDIO/TDO sense point).
+
+        config DAP_PIN_TMS
+            int "JTAG TMS pin (JTAG mode, drives SWDIO/TMS line)"
+            default 24
+            help
+                Drives the TMS line during JTAG state shifts. In SWD mode this
+                pin is switched to high-impedance so the SPI MOSI path owns the
+                line through the series resistor.
+
+        config DAP_PIN_TDI
+            int "JTAG TDI pin (mirrors SPI MOSI via GPIO matrix)"
+            default 35
+            help
+                Same SPI MOSI matrix signal fans out to this pin; wire it to the
+                target TDI (debug pin 7).
+
+        config DAP_PIN_TDO
+            int "JTAG TDO pin (SWD sense and TDO share SPI MISO)"
+            default 36
+            help
+                Wire it to target TDO (debug pin 13). The firmware routes SPI
+                MISO to this pin in JTAG mode and to the SWDIO sense pin in
+                SWD mode (GPIO matrix re-mux, no hardware mux needed).
+
+        config DAP_PIN_NRESET
+            int "nRESET pin"
+            default 25
+
+        config DAP_PIN_NTRST
+            int "nTRST pin (-1 to disable)"
+            default 37
+
+        config DAP_SWD_DEFAULT_CLOCK_HZ
+            int "Default SWD/JTAG clock (Hz)"
+            range 100000 40000000
+            default 2000000
+    endmenu
+
+    menu "Virtual UART Pins (USB CDC bridge)"
+        config DAP_UART_PORT
+            int "UART peripheral number bridged to USB CDC"
+            range 1 2
+            default 1
+            help
+                Physical UART exposed as the composite device's CDC-ACM
+                interface (mbed-style serial port). UART0 is reserved for
+                the ESP log console.
+
+        config DAP_UART_TX_PIN
+            int "Bridge UART TX pin (connect to target RXD)"
+            default 17
+
+        config DAP_UART_RX_PIN
+            int "Bridge UART RX pin (connect to target TXD)"
+            default 18
+
+        config DAP_UART_DEFAULT_BAUD
+            int "Default UART baud rate (host can change it via CDC line coding)"
+            default 115200
+    endmenu
+
+    menu "Feature Toggles"
+        config DAP_JTAG_ENABLE
+            bool "Enable JTAG transport in addition to SWD"
+            default y
+
+        config DAP_SPI_ACCEL
+            bool "Accelerate data shifts with the SPI hardware"
+            default y
+            help
+                Bulk target shifts go through the SPI shifter. Short state
+                sequences always use register-level bit manipulation for
+                exact turnaround control. Disable to bit-bang everything
+                (slower, useful when no series resistor is fitted).
+
+        config DAP_SPI_FRAME
+            bool "EXPERIMENTAL: drive full SWD register frames with the SPI shifter"
+            default n
+            depends on DAP_SPI_ACCEL
+            help
+                Route the whole SWD register transaction (request/ACK/data)
+                through SPI2 instead of GPIO bit-banging. Still being tuned
+                for read-phase sampling; leave off for the proven bit-bang path.
+    endmenu
+endmenu

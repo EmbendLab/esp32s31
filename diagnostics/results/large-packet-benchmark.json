@@ -1,0 +1,13 @@
+{
+  "note": "Equal 1016-byte DPIDR read workload, not Flash download speed",
+  "rounds_per_case": 20,
+  "packet_capacity": 1024,
+  "two_127_word_commands": {
+    "median_ms": 45.31,
+    "p95_ms": 107.944
+  },
+  "one_254_word_command": {
+    "median_ms": 28.314,
+    "p95_ms": 43.94
+  }
+}

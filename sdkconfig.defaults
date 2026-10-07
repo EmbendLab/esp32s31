@@ -1,0 +1,30 @@
+# 目标芯片与 Flash
+CONFIG_IDF_TARGET="esp32s31"
+CONFIG_ESPTOOLPY_FLASHSIZE_2MB=y
+
+# TinyUSB 复合设备（4 接口）：
+#   - 1 个 Vendor Specific 接口 = CMSIS-DAP v2 bulk/WinUSB（pyOCD/OpenOCD 高速口）
+#   - 1 个 HID 接口 = CMSIS-DAP v1 vendor report（usage FF00/01，Keil/IAR 发现口）
+#   - 1 个 CDC-ACM 接口组（通信+数据）= mbed 风格虚拟串口，透传目标 UART
+# 必须为多接口复合设备（usbccgp 父设备 + 子 PDO），Windows 才会为接口 0
+# 注入 MS OS 2.0 WINUSB 兼容 ID 并自动绑定 winusb.inf；HID 与 CDC 功能由系统
+# 自带 HidUsb / usbser.sys 匹配。单功能设备的 PDO 直挂路径在本机不会触发 WINUSB 注入。
+# S31 上 Vendor/CDC 的 FIFO 与端点缓冲默认均为 512 字节（HS）。
+# HID 的 512B report 缓冲 CFG_TUD_HID_EP_BUFSIZE 由顶层 CMakeLists 全局置为 512。
+CONFIG_TINYUSB_VENDOR_COUNT=1
+CONFIG_TINYUSB_HID_COUNT=1
+CONFIG_TINYUSB_CDC_ENABLED=y
+
+# USB-OTG 独占内置 PHY：不使用 USB-Serial-JTAG 作次级控制台（日志仍走 UART0）
+# choice 项必须显式选中 NONE，写 =n 不会改变 choice 选择
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+# 调试桥要求全程实时响应，不启用电源管理自动降频/light sleep
+CONFIG_PM_ENABLE=n
+
+# 网络固定核0，SWD/DAP 固定核1，避免 TCP/IP 抢占时序核。
+CONFIG_LWIP_TCPIP_TASK_AFFINITY_CPU0=y
+CONFIG_ESP_WIFI_TASK_PINNED_TO_CORE_0=y
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_320=y
+CONFIG_ESP_PHY_MAX_WIFI_TX_POWER=20
+CONFIG_DAP_USBIP_PACKET_SIZE=512

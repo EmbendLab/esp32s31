@@ -1,0 +1,8 @@
+{
+  "partial_header_response_wake": "PASS",
+  "partial_payload_response_wake": "PASS",
+  "swo_isolated_and_invalid_endpoints_stall": "PASS",
+  "eight_outstanding_requests": "PASS: 20 windows",
+  "unlink_then_retry": "PASS",
+  "detach_with_pending_commands": "PASS: 5 reconnects"
+}

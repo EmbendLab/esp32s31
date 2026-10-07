@@ -1,0 +1,27 @@
+{
+  "packet_capacity_bytes": 512,
+  "packet_window": 8,
+  "note": "Probe information queries, not Flash download throughput",
+  "round_trip_out_2_bytes": {
+    "count": 50,
+    "min_ms": 3.675,
+    "median_ms": 7.116,
+    "p95_ms": 38.201,
+    "max_ms": 51.368
+  },
+  "round_trip_out_512_bytes": {
+    "count": 50,
+    "min_ms": 3.987,
+    "median_ms": 6.456,
+    "p95_ms": 32.347,
+    "max_ms": 40.503
+  },
+  "window_total_time": {
+    "count": 20,
+    "min_ms": 38.026,
+    "median_ms": 54.478,
+    "p95_ms": 210.508,
+    "max_ms": 210.508
+  },
+  "window_commands_per_second": 117.5
+}

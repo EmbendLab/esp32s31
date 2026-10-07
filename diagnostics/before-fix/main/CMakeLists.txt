@@ -1,0 +1,24 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "wifi_ap/wifi_ap.c"
+        "dap_link/dap_link.c"
+        "dap/dap_bus.c"
+        "dap/cmsis_dap.c"
+        "usb_dap/usb_dap.c"
+        "usb_dap/usb_descriptors.c"
+        "usb_dap/cdc_uart.c"
+    INCLUDE_DIRS
+        "."
+        "wifi_ap/include"
+        "dap_link/include"
+        "dap/include"
+        "usb_dap/include"
+    PRIV_REQUIRES
+        esp_wifi
+        nvs_flash
+        esp_driver_gpio
+        esp_driver_spi
+        esp_driver_uart
+        tinyusb
+)

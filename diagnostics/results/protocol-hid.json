@@ -1,0 +1,12 @@
+{
+  "backend": "hid",
+  "firmware": "1.1.0",
+  "packet_count": 8,
+  "dpidr": "0x2ba01477",
+  "block_dp_read": "PASS",
+  "queued_responses": "PASS (20 windows)",
+  "rom_base": "0xe00ff000",
+  "keil_check_id": "PASS (Transfer and TransferBlock)",
+  "cpuid": "0x410fc241",
+  "sram_write_read_1024_bytes": "PASS (both commands)"
+}

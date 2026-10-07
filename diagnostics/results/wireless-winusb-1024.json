@@ -1,0 +1,24 @@
+{
+  "pid": "4043",
+  "backend": "WinUSB",
+  "info": {
+    "01": "00055472616500",
+    "02": "001445535033322d53333120434d5349532d44415000",
+    "03": "000b5333314441503030303100",
+    "04": "0006322e302e3000",
+    "09": "0006312e322e3000",
+    "f0": "000103",
+    "fe": "000108",
+    "ff": "00020004"
+  },
+  "packet_capacity": 1024,
+  "full_size_out": "PASS",
+  "queued_windows": "PASS: 20 windows",
+  "in_before_out": "PASS",
+  "unlink_then_retry": "PASS",
+  "dpidr": "0x6ba02477",
+  "full_size_block_read": "PASS: 255 words, 1024 response bytes",
+  "large_transfer_out": "PASS: 1023 bytes, no target writes",
+  "oversize_block_rejected": "PASS",
+  "cpuid": "0x411fc271"
+}

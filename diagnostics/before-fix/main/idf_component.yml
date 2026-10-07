@@ -1,0 +1,13 @@
+## IDF Component Manager Manifest File
+dependencies:
+  espressif/esp_wifi_remote:
+    version: ">=0.10,<2.0"
+    rules:
+      - if: "target in [esp32p4, esp32h2]"
+  espressif/esp_hosted:
+    version: "~2"
+    rules:
+      - if: "target in [esp32p4, esp32h2]"
+  # TinyUSB 设备栈：CMSIS-DAP v2 over WinUSB Bulk
+  espressif/esp_tinyusb:
+    version: "^2.0.1~1"
